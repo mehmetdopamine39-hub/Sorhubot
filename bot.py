@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# CK SORGUBOT ULTIMATE PRO v30.0 - RENDER STABLE
+# CK SORGUBOT ULTIMATE PRO v31.0 - RENDER FINAL STABLE
 # @rinexdestek | @cksorgupanel
 
 import os
@@ -494,7 +494,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"{STICKMAN['hello']}\n\n"
         f"{EMOJI['sparkle']} **Hoşgeldin {user.first_name}!**\n"
         f"━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        f"{EMOJI['rocket']} **CK SORGUBOT v30.0**\n"
+        f"{EMOJI['rocket']} **CK SORGUBOT v31.0**\n"
         f"{EMOJI['brain']} **8 Sorgu Tipi**\n"
         f"{EMOJI['shield']} **Cloudflare Korumalı**\n"
         f"{EMOJI['gift']} **Tümü ÜCRETSİZ!**\n\n"
@@ -785,7 +785,7 @@ async def startup_notification(app):
 def main():
     """Ana giriş noktası"""
     print("╔══════════════════════════════════════════════════════════════╗")
-    print("║   CK SORGUBOT ULTIMATE v30.0 - RENDER STABLE                ║")
+    print("║   CK SORGUBOT ULTIMATE v31.0 - RENDER FINAL STABLE          ║")
     print("║          @rinexdestek | @cksorgupanel                       ║")
     print("╚══════════════════════════════════════════════════════════════╝")
     
@@ -802,12 +802,8 @@ def main():
     print(f"{EMOJI['sparkle']} Her şey ÜCRETSİZ!")
     print(f"{EMOJI['gear']} Port: {PORT}\n")
     
-    # Application oluştur - basit ve sağlam
-    try:
-        app = Application.builder().token(TOKEN).build()
-    except Exception as e:
-        print(f"Application kurulum hatası: {e}")
-        return
+    # Application oluştur
+    app = Application.builder().token(TOKEN).build()
     
     # Handler'ları ekle
     app.add_handler(CommandHandler("start", start))
@@ -821,12 +817,8 @@ def main():
     except Exception as e:
         print(f"Başlangıç bildirimi hatası: {e}")
     
-    # Polling ile çalıştır - EN BASİT HALİ
-    try:
-        app.run_polling(allowed_updates=Update.ALL_TYPES)
-    except Exception as e:
-        print(f"Polling hatası: {e}")
-        raise
+    # Polling ile çalıştır
+    app.run_polling()
 
 if __name__ == "__main__":
     main()
