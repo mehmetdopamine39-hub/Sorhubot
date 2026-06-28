@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# CK SORGUBOT ULTIMATE PRO v28.1 - RENDER FIX
+# CK SORGUBOT ULTIMATE PRO v29.0 - RENDER FINAL
 # @rinexdestek | @cksorgupanel
 
 import os
@@ -24,12 +24,11 @@ ADMIN_IDS = [8610336203]
 
 # ==================== RENDER AYARLARI ====================
 PORT = int(os.environ.get("PORT", 8080))
-WEBHOOK_URL = os.environ.get("WEBHOOK_URL", "")
 
 # ==================== LOGGING ====================
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
+    level=logging.WARNING
 )
 logger = logging.getLogger(__name__)
 
@@ -495,7 +494,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"{STICKMAN['hello']}\n\n"
         f"{EMOJI['sparkle']} **Hoşgeldin {user.first_name}!**\n"
         f"━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        f"{EMOJI['rocket']} **CK SORGUBOT v28.1**\n"
+        f"{EMOJI['rocket']} **CK SORGUBOT v29.0**\n"
         f"{EMOJI['brain']} **8 Sorgu Tipi**\n"
         f"{EMOJI['shield']} **Cloudflare Korumalı**\n"
         f"{EMOJI['gift']} **Tümü ÜCRETSİZ!**\n\n"
@@ -772,7 +771,7 @@ async def startup_notification(app):
         try:
             await bot.send_message(
                 admin_id,
-                f"{EMOJI['fire']} **BOT BAŞLATILDI!** (Render)\n━━━━━━━━━━━━━━━━━━━━━━\n\n"
+                f"{EMOJI['fire']} **BOT BAŞLATILDI!**\n━━━━━━━━━━━━━━━━━━━━━━\n\n"
                 f"{EMOJI['user']} **Admin:** @rinexdestek\n"
                 f"{EMOJI['crown']} **Kanal:** @cksorgupanel\n"
                 f"{EMOJI['time']} **Zaman:** {datetime.now().strftime('%d.%m.%Y %H:%M:%S')}\n\n"
@@ -783,10 +782,10 @@ async def startup_notification(app):
             print(f"Admin mesaj gönderilemedi: {e}")
 
 # ==================== ANA FONKSİYON ====================
-async def main_async():
-    """Ana async fonksiyon"""
+def main():
+    """Ana giriş noktası"""
     print("╔══════════════════════════════════════════════════════════════╗")
-    print("║   CK SORGUBOT ULTIMATE v28.1 - RENDER FIX                  ║")
+    print("║   CK SORGUBOT ULTIMATE v29.0 - RENDER FINAL                 ║")
     print("║          @rinexdestek | @cksorgupanel                       ║")
     print("╚══════════════════════════════════════════════════════════════╝")
     
@@ -797,7 +796,7 @@ async def main_async():
     # Veritabanını hazırla
     init_db()
     
-    # Application oluştur
+    # Application oluştur - basit ve sağlam
     app = Application.builder().token(TOKEN).build()
     
     # Handler'ları ekle
@@ -809,35 +808,16 @@ async def main_async():
     print(f"{EMOJI['crown']} @rinexdestek")
     print(f"{EMOJI['gift']} Premium Emojiler: AKTİF")
     print(f"{EMOJI['sparkle']} Her şey ÜCRETSİZ!")
-    print(f"{EMOJI['gear']} Port: {PORT}")
-    print(f"{EMOJI['info']} Mod: Polling\n")
+    print(f"{EMOJI['gear']} Port: {PORT}\n")
     
-    # Başlangıç bildirimi
-    await startup_notification(app)
-    
-    # Polling ile çalıştır
-    await app.initialize()
-    await app.start()
-    await app.updater.start_polling()
-    
-    # Sonsuz döngü
+    # Başlangıç bildirimi (arka planda)
     try:
-        while True:
-            await asyncio.sleep(1)
-    except KeyboardInterrupt:
-        await app.updater.stop()
-        await app.stop()
-        await app.shutdown()
-
-def main():
-    """Ana giriş noktası"""
-    try:
-        asyncio.run(main_async())
-    except KeyboardInterrupt:
-        print("\nBot durduruldu.")
-    except Exception as e:
-        print(f"HATA: {e}")
-        sys.exit(1)
+        asyncio.get_event_loop().run_until_complete(startup_notification(app))
+    except:
+        pass
+    
+    # Polling ile çalıştır - EN BASİT HALİ
+    app.run_polling(allowed_updates=Update.ALL_TYPES)
 
 if __name__ == "__main__":
     main()
