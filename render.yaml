@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: ck-sorgubot
+    runtime: python
+    plan: free
+    region: frankfurt
+    buildCommand: pip install -r requirements.txt
+    startCommand: python bot.py
+    envVars:
+      - key: TOKEN
+        value: 8254362814:AAFWFOZNy0FEG-ZwUmeO8gZf6wfHplwfN7A
+      - key: PORT
+        value: 8080
