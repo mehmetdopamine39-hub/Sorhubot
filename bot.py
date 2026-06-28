@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# CK SORGUBOT ULTIMATE PRO v28.0 - RENDER EDITION
+# CK SORGUBOT ULTIMATE PRO v28.1 - RENDER FIX
 # @rinexdestek | @cksorgupanel
 
 import os
@@ -14,7 +14,6 @@ import ssl
 import logging
 import time
 import re
-import subprocess
 from datetime import datetime
 from typing import Optional, Dict, Any, Tuple
 from urllib.parse import urlencode
@@ -27,48 +26,12 @@ ADMIN_IDS = [8610336203]
 PORT = int(os.environ.get("PORT", 8080))
 WEBHOOK_URL = os.environ.get("WEBHOOK_URL", "")
 
-# ==================== PAKET KURULUMU ====================
-def install_packages():
-    """Paketleri kur"""
-    packages = {
-        'pycryptodome': 'Crypto',
-        'aiohttp': 'aiohttp',
-        'python-telegram-bot': 'telegram',
-        'cloudscraper': 'cloudscraper',
-        'gunicorn': 'gunicorn'
-    }
-    
-    print("📦 GEREKLİ PAKETLER KURULUYOR...")
-    print("━" * 40)
-    
-    installed = []
-    failed = []
-    
-    for package, import_name in packages.items():
-        try:
-            __import__(import_name)
-            print(f"✅ {package} zaten kurulu")
-            installed.append(package)
-        except ImportError:
-            print(f"📥 {package} kuruluyor...")
-            try:
-                subprocess.check_call([sys.executable, "-m", "pip", "install", package, "-q"])
-                print(f"✅ {package} kuruldu!")
-                installed.append(package)
-            except Exception as e:
-                print(f"❌ {package} kurulamadı: {e}")
-                failed.append(package)
-    
-    print("━" * 40)
-    
-    if failed:
-        print(f"❌ BAŞARISIZ PAKETLER: {', '.join(failed)}")
-    else:
-        print("✅ TÜM PAKETLER HAZIR!")
-    
-    return installed, failed
-
-INSTALLED, FAILED = install_packages()
+# ==================== LOGGING ====================
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
+logger = logging.getLogger(__name__)
 
 # ==================== TELEGRAM IMPORT ====================
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
@@ -78,44 +41,15 @@ import cloudscraper
 import aiohttp
 from aiohttp import ClientSession, TCPConnector, ClientTimeout
 
-# ==================== LOGGING ====================
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.WARNING
-)
-logger = logging.getLogger(__name__)
-
 # ==================== PREMIUM EMOJİLER ====================
 EMOJI = {
-    "logo": "🤖",
-    "sparkle": "✨",
-    "fire": "🔥",
-    "crown": "👑",
-    "check": "✅",
-    "error": "❌",
-    "info": "ℹ️",
-    "warning": "⚠️",
-    "lock": "🔒",
-    "unlock": "🔓",
-    "user": "👤",
-    "search": "🔍",
-    "phone": "📱",
-    "home": "🏠",
-    "bank": "🏦",
-    "chart": "📊",
-    "gear": "⚙️",
-    "menu": "📋",
-    "back": "🔙",
-    "rocket": "🚀",
-    "shield": "🛡️",
-    "star": "⭐",
-    "gift": "🎁",
-    "cool": "😎",
-    "brain": "🧠",
-    "target": "🎯",
-    "database": "🗄️",
-    "megaphone": "📢",
-    "package": "📦",
+    "sparkle": "✨", "fire": "🔥", "crown": "👑", "check": "✅",
+    "error": "❌", "info": "ℹ️", "warning": "⚠️", "lock": "🔒",
+    "unlock": "🔓", "user": "👤", "search": "🔍", "phone": "📱",
+    "home": "🏠", "bank": "🏦", "chart": "📊", "gear": "⚙️",
+    "menu": "📋", "back": "🔙", "rocket": "🚀", "shield": "🛡️",
+    "star": "⭐", "gift": "🎁", "cool": "😎", "brain": "🧠",
+    "target": "🎯", "database": "🗄️", "megaphone": "📢", "package": "📦",
     "time": "⏰"
 }
 
@@ -561,7 +495,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"{STICKMAN['hello']}\n\n"
         f"{EMOJI['sparkle']} **Hoşgeldin {user.first_name}!**\n"
         f"━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        f"{EMOJI['rocket']} **CK SORGUBOT v28.0**\n"
+        f"{EMOJI['rocket']} **CK SORGUBOT v28.1**\n"
         f"{EMOJI['brain']} **8 Sorgu Tipi**\n"
         f"{EMOJI['shield']} **Cloudflare Korumalı**\n"
         f"{EMOJI['gift']} **Tümü ÜCRETSİZ!**\n\n"
@@ -832,18 +766,13 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ==================== STARTUP NOTIFICATION ====================
 async def startup_notification(app):
-    """Bot başladığında admin'e ve tüm kullanıcılara mesaj gönder"""
+    """Bot başladığında admin'e mesaj gönder"""
     bot = app.bot
-    
-    # Admin'e özel mesaj
     for admin_id in ADMIN_IDS:
         try:
             await bot.send_message(
                 admin_id,
                 f"{EMOJI['fire']} **BOT BAŞLATILDI!** (Render)\n━━━━━━━━━━━━━━━━━━━━━━\n\n"
-                f"{EMOJI['package']} **Paket Durumu:**\n"
-                f"✅ Kurulan: {', '.join(INSTALLED) if INSTALLED else 'Yok'}\n"
-                f"{'❌ Başarısız: ' + ', '.join(FAILED) if FAILED else '✅ Tüm paketler hazır'}\n\n"
                 f"{EMOJI['user']} **Admin:** @rinexdestek\n"
                 f"{EMOJI['crown']} **Kanal:** @cksorgupanel\n"
                 f"{EMOJI['time']} **Zaman:** {datetime.now().strftime('%d.%m.%Y %H:%M:%S')}\n\n"
@@ -852,75 +781,12 @@ async def startup_notification(app):
             )
         except Exception as e:
             print(f"Admin mesaj gönderilemedi: {e}")
-    
-    # Tüm kullanıcılara mesaj (adminler hariç)
-    users = get_all_users()
-    success_count = 0
-    fail_count = 0
-    
-    for uid in users:
-        if uid in ADMIN_IDS:
-            continue
-        try:
-            await bot.send_message(
-                uid,
-                f"{STICKMAN['wave']}\n\n"
-                f"{EMOJI['sparkle']} **CK SORGUBOT YENİDEN BAŞLATILDI!**\n"
-                f"━━━━━━━━━━━━━━━━━━━━━━\n\n"
-                f"{EMOJI['rocket']} **v28.0 RENDER EDITION**\n"
-                f"{EMOJI['gift']} **Tüm sorgular ÜCRETSİZ!**\n"
-                f"{EMOJI['crown']} **Destek:** @rinexdestek\n\n"
-                f"{EMOJI['cool']} *Keyifli kullanımlar!*",
-                parse_mode=ParseMode.MARKDOWN
-            )
-            success_count += 1
-        except:
-            fail_count += 1
-        await asyncio.sleep(0.03)
-    
-    print(f"\n{EMOJI['megaphone']} Başlangıç mesajları gönderildi!")
-    print(f"✅ Başarılı: {success_count} | ❌ Başarısız: {fail_count}")
-
-# ==================== WEBHOOK SETUP ====================
-async def setup_webhook(app):
-    """Webhook kurulumu"""
-    if WEBHOOK_URL:
-        webhook_path = f"/webhook/{TOKEN}"
-        full_url = f"{WEBHOOK_URL}{webhook_path}"
-        
-        await app.bot.set_webhook(url=full_url)
-        print(f"{EMOJI['check']} Webhook kuruldu: {full_url}")
-        
-        # Flask benzeri web server başlat (Render için)
-        from aiohttp import web
-        
-        async def webhook_handler(request):
-            """Webhook isteklerini işle"""
-            try:
-                data = await request.json()
-                update = Update.de_json(data, app.bot)
-                await app.process_update(update)
-                return web.Response(status=200)
-            except Exception as e:
-                print(f"Webhook hatası: {e}")
-                return web.Response(status=500)
-        
-        app_web = web.Application()
-        app_web.router.add_post(f"/webhook/{TOKEN}", webhook_handler)
-        
-        # Web sunucusunu başlat
-        runner = web.AppRunner(app_web)
-        await runner.setup()
-        site = web.TCPSite(runner, host="0.0.0.0", port=PORT)
-        await site.start()
-        print(f"{EMOJI['fire']} Webhook sunucusu başlatıldı: {PORT}")
-        
-        return runner, site
 
 # ==================== ANA FONKSİYON ====================
-def main():
+async def main_async():
+    """Ana async fonksiyon"""
     print("╔══════════════════════════════════════════════════════════════╗")
-    print("║   CK SORGUBOT ULTIMATE v28.0 - RENDER EDITION              ║")
+    print("║   CK SORGUBOT ULTIMATE v28.1 - RENDER FIX                  ║")
     print("║          @rinexdestek | @cksorgupanel                       ║")
     print("╚══════════════════════════════════════════════════════════════╝")
     
@@ -939,38 +805,39 @@ def main():
     app.add_handler(CallbackQueryHandler(callback))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     
-    # Başlangıç bildirimleri
-    async def startup_callback():
-        await startup_notification(app)
-    
-    app.job_queue.run_once(startup_callback, 0)
-    
     print(f"\n{EMOJI['fire']} Bot Başlatılıyor...")
     print(f"{EMOJI['crown']} @rinexdestek")
     print(f"{EMOJI['gift']} Premium Emojiler: AKTİF")
-    print(f"{EMOJI['package']} Kurulu Paketler: {', '.join(INSTALLED)}")
     print(f"{EMOJI['sparkle']} Her şey ÜCRETSİZ!")
     print(f"{EMOJI['gear']} Port: {PORT}")
-    print(f"{EMOJI['info']} Webhook: {'AKTİF' if WEBHOOK_URL else 'Polling'}\n")
+    print(f"{EMOJI['info']} Mod: Polling\n")
     
-    # Webhook veya Polling
-    if WEBHOOK_URL:
-        # Webhook modu
-        loop = asyncio.get_event_loop()
-        
-        async def run_webhook():
-            runner, site = await setup_webhook(app)
-            try:
-                # Sonsuz döngü
-                while True:
-                    await asyncio.sleep(1)
-            except KeyboardInterrupt:
-                await runner.cleanup()
-        
-        loop.run_until_complete(run_webhook())
-    else:
-        # Polling modu (geliştirme için)
-        app.run_polling(allowed_updates=Update.ALL_TYPES)
+    # Başlangıç bildirimi
+    await startup_notification(app)
+    
+    # Polling ile çalıştır
+    await app.initialize()
+    await app.start()
+    await app.updater.start_polling()
+    
+    # Sonsuz döngü
+    try:
+        while True:
+            await asyncio.sleep(1)
+    except KeyboardInterrupt:
+        await app.updater.stop()
+        await app.stop()
+        await app.shutdown()
+
+def main():
+    """Ana giriş noktası"""
+    try:
+        asyncio.run(main_async())
+    except KeyboardInterrupt:
+        print("\nBot durduruldu.")
+    except Exception as e:
+        print(f"HATA: {e}")
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()
