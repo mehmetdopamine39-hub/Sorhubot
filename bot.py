@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# CK SORGUBOT ULTIMATE PRO v29.0 - RENDER FINAL
+# CK SORGUBOT ULTIMATE PRO v30.0 - RENDER STABLE
 # @rinexdestek | @cksorgupanel
 
 import os
@@ -494,7 +494,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"{STICKMAN['hello']}\n\n"
         f"{EMOJI['sparkle']} **Hoşgeldin {user.first_name}!**\n"
         f"━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        f"{EMOJI['rocket']} **CK SORGUBOT v29.0**\n"
+        f"{EMOJI['rocket']} **CK SORGUBOT v30.0**\n"
         f"{EMOJI['brain']} **8 Sorgu Tipi**\n"
         f"{EMOJI['shield']} **Cloudflare Korumalı**\n"
         f"{EMOJI['gift']} **Tümü ÜCRETSİZ!**\n\n"
@@ -785,7 +785,7 @@ async def startup_notification(app):
 def main():
     """Ana giriş noktası"""
     print("╔══════════════════════════════════════════════════════════════╗")
-    print("║   CK SORGUBOT ULTIMATE v29.0 - RENDER FINAL                 ║")
+    print("║   CK SORGUBOT ULTIMATE v30.0 - RENDER STABLE                ║")
     print("║          @rinexdestek | @cksorgupanel                       ║")
     print("╚══════════════════════════════════════════════════════════════╝")
     
@@ -796,28 +796,37 @@ def main():
     # Veritabanını hazırla
     init_db()
     
-    # Application oluştur - basit ve sağlam
-    app = Application.builder().token(TOKEN).build()
-    
-    # Handler'ları ekle
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CallbackQueryHandler(callback))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-    
     print(f"\n{EMOJI['fire']} Bot Başlatılıyor...")
     print(f"{EMOJI['crown']} @rinexdestek")
     print(f"{EMOJI['gift']} Premium Emojiler: AKTİF")
     print(f"{EMOJI['sparkle']} Her şey ÜCRETSİZ!")
     print(f"{EMOJI['gear']} Port: {PORT}\n")
     
-    # Başlangıç bildirimi (arka planda)
+    # Application oluştur - basit ve sağlam
     try:
-        asyncio.get_event_loop().run_until_complete(startup_notification(app))
-    except:
-        pass
+        app = Application.builder().token(TOKEN).build()
+    except Exception as e:
+        print(f"Application kurulum hatası: {e}")
+        return
+    
+    # Handler'ları ekle
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CallbackQueryHandler(callback))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    
+    # Başlangıç bildirimi
+    try:
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(startup_notification(app))
+    except Exception as e:
+        print(f"Başlangıç bildirimi hatası: {e}")
     
     # Polling ile çalıştır - EN BASİT HALİ
-    app.run_polling(allowed_updates=Update.ALL_TYPES)
+    try:
+        app.run_polling(allowed_updates=Update.ALL_TYPES)
+    except Exception as e:
+        print(f"Polling hatası: {e}")
+        raise
 
 if __name__ == "__main__":
     main()
